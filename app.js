@@ -160,7 +160,7 @@ app.command('/my-team-gt', async ({ command, ack, respond }) => {
   });
 });
 
-app.command('/poke-trivia-gt', async ({ command, ack, respond }) => {
+app.command('/poke-trivia-gt', async ({ command, ack, say }) => {
   await ack();
 
   try {
@@ -178,7 +178,7 @@ app.command('/poke-trivia-gt', async ({ command, ack, respond }) => {
 
     const correctName = correctData.name.charAt(0).toUpperCase() + correctData.name.slice(1);
     const types = correctData.types.map(t => t.type.name).join(', ');
-    const sprite = correctData.sprites.other['official-artwork']?.front_default || correctData.sprites.front_default;
+    const sprite = correctData.sprites.front_default;
 
     const options = [correctName, ...wrongData.map(d =>
       d.name.charAt(0).toUpperCase() + d.name.slice(1)
@@ -188,7 +188,7 @@ app.command('/poke-trivia-gt', async ({ command, ack, respond }) => {
       [options[i], options[j]] = [options[j], options[i]];
     }
 
-    const { ts } = await respond({
+    const result = await say({
       blocks: [
         {
           "type": "header",
@@ -212,15 +212,15 @@ app.command('/poke-trivia-gt', async ({ command, ack, respond }) => {
             "type": "button",
             "text": { "type": "plain_text", "text": `${String.fromCharCode(65 + i)}. ${opt}` },
             "value": opt,
-            "action_id": `trivia_guess`
+            "action_id": "trivia_guess"
           }))
         }
       ]
     });
 
-    triviaGames.set(ts, correctName);
+    triviaGames.set(result.ts, correctName);
   } catch (error) {
-    await respond("⚠️ Something went wrong setting up the trivia. Try again!");
+    await say("⚠️ Something went wrong setting up the trivia. Try again!");
   }
 });
 
