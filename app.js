@@ -10,6 +10,13 @@ const app = new App({
 const trainerTeams = new Map();
 const triviaGames = new Map();
 
+function getStatBar(value, max = 150) {
+  const barLength = 10;
+  const filledCount = Math.min(barLength, Math.round((value / max) * barLength));
+  const emptyCount = barLength - filledCount;
+  return "🟩".repeat(filledCount) + "⬜".repeat(emptyCount);
+}
+
 app.command('/pokedex-gt', async ({ command, ack, respond }) => {
   await ack();
 
@@ -24,28 +31,35 @@ app.command('/pokedex-gt', async ({ command, ack, respond }) => {
     const data = await res.json();
 
     const name = data.name.charAt(0).toUpperCase() + data.name.slice(1);
-    const sprite = data.sprites.front_default || "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=150";
-    const types = data.types.map(t => t.type.name).join(', ');
+    const animatedSprite = data.sprites.versions?.['generation-v']?.['black-white']?.animated?.front_default
+      || data.sprites.front_default
+      || "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=150";
+    const types = data.types.map(t => `*${t.type.name.toUpperCase()}*`).join(' / ');
     const hp = data.stats[0].base_stat;
     const attack = data.stats[1].base_stat;
 
     await respond({
       blocks: [
         {
-          "type": "header",
-          "text": { "type": "plain_text", "text": `🟡 Slack Dex Entry: ${name}` }
-        },
-        {
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": `*Type(s):* ${types}\n*HP:* ${hp} | *Attack:* ${attack}\n\n_Data retrieved live from PokéAPI!_`
+            "text": `✨ *POKÉMON TRADING CARD* ✨\n*=============================*\n📛 *NAME:* ${name}\n🧬 *TYPE:* ${types}\n*=============================*\n❤️ *HP:* ${hp} \n${getStatBar(hp)}\n\n⚔️ *ATTACK:* ${attack} \n${getStatBar(attack)}`
           },
           "accessory": {
             "type": "image",
-            "image_url": sprite,
-            "alt_text": name
+            "image_url": animatedSprite,
+            "alt_text": `${name} card sprite`
           }
+        },
+        {
+          "type": "context",
+          "elements": [
+            {
+              "type": "mrkdwn",
+              "text": "🃏 _Slack Dex Series 1 • Live Animated Sprite_"
+            }
+          ]
         }
       ]
     });
@@ -61,14 +75,18 @@ app.command('/wild-encounter-gt', async ({ command, ack, respond }) => {
     const randomId = Math.floor(Math.random() * 151) + 1;
     const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${randomId}`);
     const data = await res.json();
-    const name = data.name.charAt(0).toUpperCase() + data.name.slice(1);
+
+    let name = data.name.charAt(0).toUpperCase() + data.name.slice(1);
     const isShiny = Math.random() < 0.15;
-    const sprite = isShiny
-      ? data.sprites.front_shiny || data.sprites.front_default
-      : data.sprites.front_default;
-    const encounterText = isShiny
-      ? `✨ *A wild ★ SHINY ★ ${name} appeared!* (1-in-7 odds!) What will you do?`
-      : `🌿 *A wild ${name} appeared!* What will you do?`;
+    const animContainer = data.sprites.versions?.['generation-v']?.['black-white']?.animated;
+    let animatedSprite;
+
+    if (isShiny) {
+      animatedSprite = animContainer?.front_shiny || data.sprites.front_shiny || data.sprites.front_default;
+      name = `✨ SHINY ${name} ✨`;
+    } else {
+      animatedSprite = animContainer?.front_default || data.sprites.front_default;
+    }
 
     await respond({
       blocks: [
@@ -76,11 +94,13 @@ app.command('/wild-encounter-gt', async ({ command, ack, respond }) => {
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": encounterText
+            "text": isShiny
+              ? `🌟 *RARE ENCOUNTER* 🌟\n*=============================*\n✨ *A wild, glittering ${name} jumped out!* ✨\n\n_Can you land a legendary catch? Throw a ball!_`
+              : `🌿 *WILD ENCOUNTER* 🌿\n*=============================*\n*A wild ${name} appeared in the tall grass!*\n\n_Get ready! Throw a Pokéball to add them to your collection._`
           },
           "accessory": {
             "type": "image",
-            "image_url": sprite,
+            "image_url": animatedSprite,
             "alt_text": name
           }
         },
@@ -107,7 +127,6 @@ app.action('catch_pokemon', async ({ ack, body, respond }) => {
 
   const pokemonName = body.actions[0].value;
   const userId = body.user.id;
-
   const success = Math.random() < 0.5;
 
   if (success) {
@@ -141,7 +160,7 @@ app.command('/my-team-gt', async ({ command, ack, respond }) => {
     return await respond("🎒 Your party is empty! Run `/wild-encounter-gt` to start catching Pokémon.");
   }
 
-  const teamList = team.map((p, index) => `${index + 1}. *${p}*`).join('\n');
+  const teamList = team.map((p, index) => `${index + 1}. ${p}`).join('\n');
 
   await respond({
     blocks: [
