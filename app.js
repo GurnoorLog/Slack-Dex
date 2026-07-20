@@ -231,7 +231,7 @@ app.command('/poke-trivia-gt', async ({ command, ack, say }) => {
             "type": "button",
             "text": { "type": "plain_text", "text": `${String.fromCharCode(65 + i)}. ${opt}` },
             "value": opt,
-            "action_id": "trivia_guess"
+            "action_id": `trivia_guess_${i}`
           }))
         }
       ]
@@ -243,7 +243,7 @@ app.command('/poke-trivia-gt', async ({ command, ack, say }) => {
   }
 });
 
-app.action('trivia_guess', async ({ ack, body, respond }) => {
+app.action(/^trivia_guess_/, async ({ ack, body, respond }) => {
   await ack();
 
   const guess = body.actions[0].value;
