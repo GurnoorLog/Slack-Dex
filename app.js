@@ -1,10 +1,18 @@
 require('dotenv').config();
-const { App } = require('@slack/bolt');
+const { App, ExpressReceiver } = require('@slack/bolt');
 const fetch = require('node-fetch');
+
+const receiver = new ExpressReceiver({
+  signingSecret: process.env.SLACK_SIGNING_SECRET
+});
+
+receiver.router.get('/', (req, res) => {
+  res.status(200).send('⚡️ Slack Dex is running!');
+});
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  receiver
 });
 
 const trainerTeams = new Map();
