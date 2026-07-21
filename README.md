@@ -1,30 +1,24 @@
-# Slack Dex ⚡️
+# Slack Dex
 
-A Pokémon companion bot for Slack that lets you look up Pokémon stats, encounter wild Pokémon, catch them, and play trivia — all inside your workspace. Features animated Gen V sprites and real trading card-style layouts.
+A Pokémon bot for Slack I built for the Hack Club Stardance challenge. You can look up any Pokémon's stats, encounter wild ones in your channel, catch them, and play guess-the-Pokémon trivia.
 
 ## Commands
 
-| Command | Description |
-|---|---|
-| `/pokedex-gt <name>` | Look up any Pokémon — shows an animated trading card with HP, Attack, type, and stat bars |
-| `/wild-encounter-gt` | A random Gen 1 Pokémon appears! 15% chance of a **shiny** encounter. Tap *Throw Pokéball!* to try to catch it (50% catch rate) |
-| `/my-team-gt` | View all the Pokémon you've caught |
-| `/poke-trivia-gt` | "Who's That Pokémon?" — guess the mystery Pokémon from type clues with multiple-choice buttons |
+**`/pokedex-gt <name>`** — Gets data from PokéAPI and shows an animated trading card with HP, attack, type, and stat bars. The sprites are from Pokémon Black/White so they actually move.
 
-## Tech Stack
+**`/wild-encounter-gt`** — A random Gen 1 Pokémon pops up. 15% of the time it'll be shiny (different color + special sparkle). Hit the button to try catching it — it's a 50/50 chance.
 
-- **Node.js** with `@slack/bolt` framework
-- **PokéAPI** — live Pokémon data and animated sprites (Gen V Black/White)
-- **Slack Block Kit** — interactive buttons, trading card UI with emoji stat bars
-- **Render** — free 24/7 cloud deployment
+**`/my-team-gt`** — Lists every Pokémon you've caught so far.
 
-## Deployment
+**`/poke-trivia-gt`** — Four multiple choice buttons, one mystery Pokémon. Guess right and you win.
 
-1. Create a Slack app at https://api.slack.com/apps
-2. Set up slash commands (`/pokedex-gt`, `/wild-encounter-gt`, `/my-team-gt`, `/poke-trivia-gt`) pointing to `https://your-domain.onrender.com/slack/events`
-3. Enable Interactivity & Shortcuts with the same URL
-4. Set environment variables: `SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET`, `PORT`
-5. Deploy to Render (or any Node.js host)
+## How it works
+
+Node.js + Slack's Bolt framework. All Pokémon data comes live from PokéAPI. The card layout uses Slack's Block Kit. Runs on a Hack Club Nest server.
+
+## Setup
+
+Created a Slack app at api.slack.com, added 4 slash commands pointing to the bot's endpoint, turned on Interactivity, and deployed it. The bot token and signing secret are set as env variables.
 
 ## Environment Variables
 
