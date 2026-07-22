@@ -1,29 +1,25 @@
 # Slack Dex
 
-A Pokémon bot for Slack I built for the Hack Club Stardance challenge. You can look up any Pokémon's stats, encounter wild ones in your channel, catch them, and play guess-the-Pokémon trivia.
+A Pokémon bot I made for Slack as part of Hack Club's Stardance challenge. You can look up Pokémon, run into wild ones in your channel, catch them, and play a guessing game.
 
 ## Commands
 
-**`/pokedex-gt <name>`** — Gets data from PokéAPI and shows an animated trading card with HP, attack, type, and stat bars. The sprites are from Pokémon Black/White so they actually move.
+**`/pokedex-gt pikachu`** — type any Pokémon name and it shows up as a little trading card with its stats, type, and an animated sprite that actually bounces around (it's the Gen 5 sprite from the games).
 
-**`/wild-encounter-gt`** — A random Gen 1 Pokémon pops up. 15% of the time it'll be shiny (different color + special sparkle). Hit the button to try catching it — it's a 50/50 chance.
+**`/wild-encounter-gt`** — a random Pokémon appears in the channel. About 15% of the time it'll be shiny (different color + sparkle). Hit the button to throw a Pokéball and try to catch it — it's random whether you get it or not.
 
-**`/my-team-gt`** — Lists every Pokémon you've caught so far.
+**`/my-team-gt`** — shows every Pokémon you've caught.
 
-**`/poke-trivia-gt`** — Four multiple choice buttons, one mystery Pokémon. Guess right and you win.
+**`/poke-trivia-gt`** — four buttons pop up with different names, one of them is the mystery Pokémon. Guess right and it tells everyone you got it.
 
 ## How it works
 
-Node.js + Slack's Bolt framework. All Pokémon data comes live from PokéAPI. The card layout uses Slack's Block Kit. Runs on a Hack Club Nest server.
+It's a Node.js app using Slack's Bolt library. The Pokémon data comes live from the PokéAPI whenever someone runs a command. The card layout is done with Slack's Block Kit — it's not real CSS but you can fake a card look pretty well with emojis and dividers. 
 
-## Setup
+It runs on a Hack Club Nest server so it stays on 24/7.
 
-Created a Slack app at api.slack.com, added 4 slash commands pointing to the bot's endpoint, turned on Interactivity, and deployed it. The bot token and signing secret are set as env variables.
+## Making your own
 
-## Environment Variables
+You'll need a Slack app from api.slack.com, a bot token, and a signing secret. Point the slash commands and interactivity URL to wherever you host it (like `https://your-domain/slack/events`). The env vars are SLACK_BOT_TOKEN, SLACK_SIGNING_SECRET, and PORT.
 
-```
-SLACK_BOT_TOKEN=xoxb-...
-SLACK_SIGNING_SECRET=...
-PORT=3000
-```
+The code is just one file — app.js. Everything happens in there.
